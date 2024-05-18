@@ -86,8 +86,8 @@ def main():
     # Write the mp3 titles in the name_file
     with open(name_file, "w") as file:
         for line in mp4_names:
-            print("line", line)
-            file.write(line+"\n")
+            file_title = line.removesuffix('.mp4')
+            file.write(file_title+"\n")
 
 
     # Read titles from the name_file
