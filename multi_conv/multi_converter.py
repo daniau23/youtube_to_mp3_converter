@@ -3,11 +3,10 @@ from moviepy.editor import *
 import os
 import shutil
 
-def downloader(url:str):
+def downloader(url:str, quality:str):
     # Create a Youtube object
     yt = YouTube(url)
     # Select  quality
-    quality = input(" Select your video quality (high or low) > ")
     if quality == "high":
         stream = yt.streams.get_highest_resolution()
     elif quality == "low":
@@ -73,22 +72,30 @@ def main():
                 print(f"Directory '{directory}' created successfully.")
 
     # Read links from the link_file
-    with open(link_file, 'r') as link_file:
-        links = [line.strip() for line in link_file]
+    with open(link_file, 'r') as file:
+        links = [line.strip() for line in file if line not in ['\n', '\r\n']]
 
     # Download videos
+    quality = input(" Select your video quality (high or low) > ")
     for link in links:
-        downloader(url=link)
+        downloader(url=link, quality=quality)
 
     # Get the list of downloaded MP4 files
-    mp4_files = [f for f in os.listdir(mp4_dir) if f.endswith('.mp4')]
+    mp4_names = [f for f in os.listdir(mp4_dir) if f.endswith('.mp4')]
+
+    # Write the mp3 titles in the name_file
+    with open(name_file, "w") as file:
+        for line in mp4_names:
+            file_title = line.removesuffix('.mp4')
+            file.write(file_title+"\n")
+
 
     # Read titles from the name_file
-    with open(name_file, 'r') as name_file:
-        titles = [line.strip() for line in name_file]
+    with open(name_file, 'r') as file:
+        titles = [line.strip() for line in file]
 
     # Convert and move files
-    for mp4_file, mp3_title in zip(mp4_files, titles):
+    for mp4_file, mp3_title in zip(mp4_names, titles):
         mp4_file_path = os.path.join(mp4_dir, mp4_file)
         converter(media=mp4_file_path, title=mp3_title)
 
